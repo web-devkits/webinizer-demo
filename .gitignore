@@ -1,0 +1,6 @@
+node_modules
+.webinizer*
+!native_projects/**/*/.webinizer
+webinizer_build
+webinizer-code
+out

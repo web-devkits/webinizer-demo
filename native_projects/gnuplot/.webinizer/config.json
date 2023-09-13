@@ -1,0 +1,9 @@
+{
+  "__type__": "ProjectConfig",
+  "name": "Gnuplot",
+  "desc": "Gnuplot is a portable command-line driven graphing utility for Linux, OS/2, MS Windows, OSX, VMS, and many other platforms.",
+  "img": "../assets/getstarted/gnuplot.png",
+  "category": "Productivity",
+  "id": 1,
+  "version": "1.0.0"
+}

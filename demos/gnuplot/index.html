@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Gnuplot Demo</title>
+    <style>
+      .hidden {
+        visibility: hidden;
+        width: 0;
+        height: 0;
+      }
+      .shown {
+        visibility: visible;
+        width: 600;
+        height: 400;
+      }
+      #wrapper {
+        display: flex;
+      }
+      #left {
+        flex: 0 0 50%;
+      }
+      #right {
+        flex: 1;
+      }
+      #apply,
+      #save {
+        font-size: 16px;
+      }
+    </style>
+    <script type="text/javascript" src="gnuplot.js"></script>
+  </head>
+  <body>
+    <h1>Demo for gnuplot</h1>
+    <div id="wrapper">
+      <div id="left">
+        <h2>gnuplot script</h2>
+        <div>
+          <textarea id="gnuplot_script" rows="20" cols="80">
+# default setting for gnuplot wasm
+set terminal svg size 600,400 enhanced font 'arial,10'
+set output 'out.svg'
+
+################################
+# your script starts from here #
+################################
+        </textarea
+          >
+        </div>
+        <h2>gnuplot data files</h2>
+        <div>
+          <input type="file" id="uploader" />
+          <table id="file_display">
+            <tr>
+              <td>Data files uploaded:</td>
+            </tr>
+          </table>
+        </div>
+        <h2>
+          <input id="apply" type="button" value="Plot" />
+        </h2>
+      </div>
+
+      <div id="right">
+        <h2>gnuplot output</h2>
+        <img src="" id="gnuimg" type="image/svg+xml" width="600" height="400" class="hidden" />
+        <h2>
+          <input id="save" type="button" value="Save as PNG" class="hidden" />
+        </h2>
+        <canvas id="gnuCanvas" style="visibility: hidden" ; position:absolute;> </canvas>
+      </div>
+    </div>
+    <script type="module">
+      const gnuplot = await initModule();
+      const dataFilesName = []; // to record uploaded data file names
+
+      function initModule() {
+        return new Promise((r, j) => {
+          r(
+            Module({
+              onRuntimeInitialized: () => {
+                console.log("gnuplot core wasm initialized!");
+              },
+            })
+          );
+        });
+      }
+
+      async function uploadDataFiles() {
+        const file = document.getElementById("uploader").files[0];
+        const { name } = file;
+        const data = await readFromBlobOrFile(file);
+        gnuplot.FS.writeFile(name, new Uint8Array(data));
+        if (!dataFilesName.includes(name)) {
+          dataFilesName.push(name);
+          const tableRef = document.getElementById("file_display");
+          const newRow = tableRef.insertRow().insertCell();
+          newRow.appendChild(document.createTextNode(name));
+        }
+      }
+
+      async function readFromBlobOrFile(blob) {
+        return new Promise((resolve, reject) => {
+          const fileReader = new FileReader();
+          fileReader.onload = () => {
+            resolve(fileReader.result);
+          };
+          fileReader.onerror = ({
+            target: {
+              error: { code },
+            },
+          }) => {
+            reject(Error(`File could not be read! Code=${code}`));
+          };
+          fileReader.readAsArrayBuffer(blob);
+        });
+      }
+
+      function runScript() {
+        const image = document.getElementById("gnuimg");
+        image.src = "";
+        image.className = "hidden";
+        const content = document.getElementById("gnuplot_script").value;
+        gnuplot.FS.writeFile("script.txt", content);
+
+        gnuplot.callMain(["script.txt"]);
+
+        const timer = setInterval(() => {
+          try {
+            const output = gnuplot.FS.readFile("out.svg");
+            clearInterval(timer);
+            image.src = URL.createObjectURL(new Blob([output.buffer], { type: "image/svg+xml" }));
+            image.className = "shown";
+            document.getElementById("save").className = "shown";
+          } catch (e) {}
+        }, 500);
+      }
+
+      function convert() {
+        const image = document.getElementById("gnuimg");
+        const canv = document.getElementById("gnuCanvas");
+        const ctx = canv.getContext("2d");
+        canv.height = image.height;
+        canv.width = image.width;
+        ctx.drawImage(image, 0, 0);
+        const imgData = canv.toDataURL("image/png");
+
+        const link = document.createElement("a");
+        link.download = "gnuplot-output.png";
+        link.href = imgData;
+        link.click();
+        link.delete;
+      }
+
+      document.getElementById("apply").addEventListener("click", runScript);
+      document.getElementById("uploader").addEventListener("change", uploadDataFiles);
+      document.getElementById("save").addEventListener("click", convert);
+    </script>
+  </body>
+</html>
