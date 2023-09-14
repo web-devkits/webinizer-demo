@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <title>Tetris</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css?family=Press+Start+2P");
+      * {
+        font-family: "Press Start 2P", sans-serif;
+      }
+      body {
+        margin: 24px;
+      }
+      h1 {
+        font-size: 36px;
+      }
+      .wrapper {
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+      }
+      .header {
+        font-size: 24px;
+        margin-left: 16px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrapper">
+      <h1>Tetris</h1>
+      <div>
+        <canvas id="canvas"></canvas>
+      </div>
+    </div>
+    <script type="application/javascript" src="Tetris.js"></script>
+    <script type="application/javascript">
+      Module({ canvas: (() => document.getElementById("canvas"))() });
+    </script>
+  </body>
+</html>

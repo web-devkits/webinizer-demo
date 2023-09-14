@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>2048 in terminal</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@4.17.0/css/xterm.css" />
+    <style>
+      .emscripten {
+        padding-right: 0;
+        margin-left: auto;
+        margin-right: auto;
+        display: block;
+      }
+      textarea.emscripten {
+        font-family: monospace;
+        width: 80%;
+      }
+      div.emscripten {
+        text-align: center;
+      }
+      div.emscripten_border {
+        border: 1px solid black;
+      }
+      /* the canvas *must not* have any border or padding, or mouse coords will be wrong */
+      canvas.emscripten {
+        border: 0px none;
+        background-color: black;
+      }
+
+      .spinner {
+        height: 50px;
+        width: 50px;
+        margin: 0px auto;
+        -webkit-animation: rotation 0.8s linear infinite;
+        -moz-animation: rotation 0.8s linear infinite;
+        -o-animation: rotation 0.8s linear infinite;
+        animation: rotation 0.8s linear infinite;
+        border-left: 10px solid rgb(0, 150, 240);
+        border-right: 10px solid rgb(0, 150, 240);
+        border-bottom: 10px solid rgb(0, 150, 240);
+        border-top: 10px solid rgb(100, 0, 200);
+        border-radius: 100%;
+        background-color: rgb(200, 100, 250);
+      }
+    </style>
+  </head>
+  <body style="background-color: #faf8ef">
+    <br />
+    <br />
+    <div class="emscripten" id="title" style="font-size: 60px"><b>2048</b></div>
+    <br /><br />
+    <br />
+    <br />
+    <div style="display: grid; place-items: center">
+      <div id="terminal" style="overflow: hidden"></div>
+    </div>
+    <br /><br />
+    <br />
+    <div class="emscripten" id="keys" style="font-size: 20px">
+      <b>Keys:</b> W(Up), S(Down), A(Left), D(Right)
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/xterm@4.17.0/lib/xterm.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xterm-pty@0.9.6/index.js"></script>
+    <script>
+      const xterm = new Terminal();
+      xterm.open(document.getElementById("terminal"));
+
+      const { master, slave } = openpty();
+      xterm.loadAddon(master);
+
+      const worker = new Worker("./2048.worker.js");
+      new TtyServer(slave).start(worker);
+    </script>
+  </body>
+</html>

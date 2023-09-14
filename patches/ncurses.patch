@@ -1,0 +1,103 @@
+diff -r -u old/config.sub new/config.sub
+--- old/config.sub	2023-07-27 11:04:11.501253578 +0800
++++ new/config.sub	2023-05-18 10:18:06.548160847 +0800
+@@ -1412,7 +1412,7 @@
+ 	      | -interix* | -uwin* | -mks* | -rhapsody* | -darwin* | -opened* \
+ 	      | -openstep* | -oskit* | -conix* | -pw32* | -nonstopux* \
+ 	      | -storm-chaos* | -tops10* | -tenex* | -tops20* | -its* \
+-	      | -os2* | -vos* | -palmos* | -uclinux* | -nucleus* \
++	      | -os2* | -vos* | -palmos* | -uclinux* | -nucleus* | -emscripten* \
+ 	      | -morphos* | -superux* | -rtmk* | -rtmk-nova* | -windiss* \
+ 	      | -powermax* | -dnix* | -nx6 | -nx7 | -sei* | -dragonfly* \
+ 	      | -skyos* | -haiku* | -rdos* | -toppers* | -drops* | -es* \
+diff -r -u old/mk-1st.awk new/mk-1st.awk
+--- old/mk-1st.awk	2023-07-27 11:04:11.501253578 +0800
++++ new/mk-1st.awk	2023-05-18 10:18:06.564160847 +0800
+@@ -477,8 +477,16 @@
+ 				print  "install \\"
+ 				print  "install.libs \\"
+ 				printf "install.%s :: $(DESTDIR)$(libdir) ../lib/%s\n", name, lib_name
+-				printf "\t@echo installing ../lib/%s as $(DESTDIR)$(libdir)/%s\n", lib_name, lib_name
+-				printf "\t$(INSTALL_DATA) ../lib/%s $(DESTDIR)$(libdir)/%s\n", lib_name, lib_name
++				if ( lib_name == "libncurses.a" )
++				{
++					printf "\t@echo installing ../lib/libncurses_g.a as $(DESTDIR)$(libdir)/libncurses.a\n"
++					printf "\t$(INSTALL_DATA) ../lib/libncurses_g.a $(DESTDIR)$(libdir)/libncurses.a\n"
++				}
++				else
++				{
++					printf "\t@echo installing ../lib/%s as $(DESTDIR)$(libdir)/%s\n", lib_name, lib_name
++					printf "\t$(INSTALL_DATA) ../lib/%s $(DESTDIR)$(libdir)/%s\n", lib_name, lib_name
++				}
+ 				if ( overwrite == "yes" && lib_name == "libncurses.a" )
+ 				{
+ 					printf "\t@echo linking libcurses.a to libncurses.a\n"
+diff -r -u old/mk-hdr.awk new/mk-hdr.awk
+--- old/mk-hdr.awk	2023-07-27 11:04:11.501253578 +0800
++++ new/mk-hdr.awk	2023-05-18 10:18:06.564160847 +0800
+@@ -88,7 +88,7 @@
+ 			for (i = 0; i < count; ++i) {
+ 				printf "	@ (cd ${INCLUDEDIR} && rm -f %s) ; ../headers.sh ${INSTALL_DATA} ${INCLUDEDIR} ${srcdir} %s\n", basename(data[i]), data[i]
+ 				if (data[i] == "curses.h" && compat == "yes") {
+-					printf "	@ (cd ${INCLUDEDIR} && rm -f ncurses.h && ${LN_S} %s ncurses.h)\n", data[i]
++					printf "	@ (cd ${INCLUDEDIR} && cd .. && rm -f ncurses.h && ${LN_S} ./ncurses/%s ncurses.h)\n", data[i]
+ 				}
+ 			}
+ 			print ""
+diff -r -u old/ncurses/curses.priv.h new/ncurses/curses.priv.h
+--- old/ncurses/curses.priv.h	2023-07-27 11:04:11.505253578 +0800
++++ new/ncurses/curses.priv.h	2023-05-18 10:18:06.564160847 +0800
+@@ -64,6 +64,23 @@
+ #include <stddef.h>		/* for offsetof */
+ #include <stdlib.h>
+ #include <string.h>
++
++#ifdef __EMSCRIPTEN__
++#ifdef getenv
++#undef getenv
++#endif
++
++#define getenv(name)(char*)\
++({\
++  char* data = getenv(name);\
++  int length = strlen(data);\
++  char* dest = (char*)malloc(length+1);\
++  strncpy(dest, data, length);\
++  dest[length+1] = '\0';\
++  dest;\
++})
++#endif
++
+ #include <sys/types.h>
+ #include <sys/stat.h>
+
+diff -r -u old/test/picsmap.c new/test/picsmap.c
+--- old/test/picsmap.c	2023-07-27 11:04:11.509253578 +0800
++++ new/test/picsmap.c	2023-05-18 10:18:06.568160847 +0800
+@@ -377,26 +381,15 @@
+     reading_ncols = 0;
+ }
+ 
+-#if HAVE_TSEARCH && HAVE_TDESTROY
+-static void
+-never_free(void *node GCC_UNUSED)
+-{
+-}
+-#endif
+-
+ static void
+ dispose_c_values(void)
+ {
+ #if HAVE_TSEARCH
+     if (reading_ntree != 0) {
+-#if HAVE_TDESTROY
+-	tdestroy(reading_ntree, never_free);
+-#else
+ 	int n;
+ 	for (n = 0; n < reading_last; ++n) {
+ 	    tdelete(I2P(n), &reading_ntree, compare_c_values);
+ 	}
+-#endif
+ 	reading_ntree = 0;
+     }
+ #endif
