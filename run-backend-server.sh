@@ -24,9 +24,9 @@ source ./emsdk_env.sh
 
 cd ../webinizer
 SERVER_DIR=`pwd`
-# update projectPool, UPLOAD_PROJECT_REPO_PATH and WEBINIZER_HOME in src/constants.ts at first
-replaceLine "export const projectPool =" "export const projectPool = \"${SCRIPT_DIR}/native_projects\";" src/constants.ts
-replaceLine "export const UPLOAD_PROJECT_REPO_PATH =" "export const UPLOAD_PROJECT_REPO_PATH = \"${SERVER_DIR}/uploaded_proj\";" src/constants.ts
-replaceLine "export const WEBINIZER_HOME =" "export const WEBINIZER_HOME = \"${SERVER_DIR}\";" src/constants.ts
-# launch the server
+# Update projectPool, UPLOAD_PROJECT_REPO_PATH and WEBINIZER_HOME in src/constants.ts at first
+replaceLine "export const projectPool = \"" "export const projectPool = \"${SCRIPT_DIR}/native_projects\";" src/constants.ts
+replaceLine "export const UPLOAD_PROJECT_REPO_PATH = \"" "export const UPLOAD_PROJECT_REPO_PATH = \"${SERVER_DIR}/uploaded_proj\";" src/constants.ts
+replaceLine "export const WEBINIZER_HOME = \"" "export const WEBINIZER_HOME = \"${SERVER_DIR}\";" src/constants.ts
+# Launch the server
 npm run serve
