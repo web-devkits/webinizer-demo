@@ -2,7 +2,7 @@
   "__type__": "ProjectConfig",
   "name": "FFmpeg",
   "desc": "FFmpeg is a free and open-source software project consisting of a suite of libraries and programs for handling video, audio, and other multimedia files and streams.",
-  "img": "../assets/getstarted/ffmpeg.png",
+  "img": { "name": "ffmpeg.png", "isUploaded": true },
   "category": "Media",
   "id": 3,
   "version": "1.0.0"

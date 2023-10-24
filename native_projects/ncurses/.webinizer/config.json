@@ -2,7 +2,7 @@
   "__type__": "ProjectConfig",
   "name": "Ncurses",
   "desc": "ncurses is a programming library that allows the programmer to write text-based user interfaces (TUI) in a terminal-independent manner.",
-  "img": "../assets/getstarted/ncurses.png",
+  "img": { "name": "ncurses.png", "isUploaded": true },
   "category": "Library",
   "id": 4,
   "version": "1.0.0"
