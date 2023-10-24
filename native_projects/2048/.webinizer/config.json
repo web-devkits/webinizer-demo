@@ -2,7 +2,7 @@
   "__type__": "ProjectConfig",
   "name": "2048",
   "desc": "2048 is an easy and fun puzzle game to slide numbered tiles on a grid to combine them to create a tile with the number 2048.",
-  "img": "../assets/getstarted/2048.png",
+  "img": { "name": "2048.png", "isUploaded": true },
   "category": "Game",
   "id": 5,
   "version": "1.0.0"

@@ -2,7 +2,7 @@
   "__type__": "ProjectConfig",
   "name": "X264",
   "desc": "x264 is a free software library and application for encoding video streams into the H.264/MPEG-4 AVC compression format.",
-  "img": "../assets/getstarted/x264.png",
+  "img": { "name": "x264.png", "isUploaded": true },
   "category": "Library",
   "id": 2,
   "version": "1.0.0"
