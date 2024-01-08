@@ -123,11 +123,25 @@
      }
    ```
 
+   ```diff
+     // CMakeLists.txt
+     project(SDL2Test)
+   + # to generate html target
+   + set(CMAKE_EXECUTABLE_SUFFIX ".html")
+   ```
+
 - Click the `SAVE` button to save the changes.
 
 - Click `Build` in the top navigation panel to route us back to the `Build` page.
 
-7. **`Build page`** - Click the `BUILD` button to trigger the build again.
+7. Receive the recipe for errors not handled by Webinzier
+
+   > `The html target file is not compatible with build options "-sMODULARIZE -sEXPORT_NAME=Module_"`
+
+8. **`Config page`** - Click `Options` in the left navigation bar and click the switch of
+   `Modularize JS output` to disable
+
+9. **`Build page`** - Click the `BUILD` button to trigger the build again.
 
 After a while, it will show `Build successfully!` on the page.
 
