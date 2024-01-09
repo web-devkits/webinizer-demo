@@ -10,7 +10,7 @@ init_git() {
     git init
     git add -A
     git commit -q -m "init for demo project"
-  fi  
+  fi
 }
 
 remove_git() {
@@ -131,6 +131,22 @@ if [[ (-d "x264-lib") && (-d "x264") ]]; then
   cd ..
   rm -rf x264-lib
   echo ">>>>>> Project x264 downloaded"
+fi
+
+echo
+echo
+echo ">>>>>> Downloading project snake"
+git clone https://github.com/udacity/CppND-Capstone-Snake-Game.git
+if [[ (-d "CppND-Capstone-Snake-Game") && (-d "snake") ]]; then
+  cd snake
+  remove_git
+  cp -r ../CppND-Capstone-Snake-Game/. .
+  # include .webinizer to track by git
+  git add -A
+  git commit -q -m "init for demo project"
+  cd ..
+  rm -rf CppND-Capstone-Snake-Game
+  echo ">>>>>> Project snake downloaded"
 fi
 
 # back to the root directory
