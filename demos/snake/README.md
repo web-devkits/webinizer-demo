@@ -25,12 +25,6 @@
    - Click the `BUILD` button to trigger the build and some recipes will show in several rounds of
      build.
 
-   - `Recipe for C++ exception` - Click the `APPLY RECIPE` button and another build will be
-     triggered.
-
-     > Note. _As the usage of C++ exception is detected in the native code, we can enable the Wasm
-     > exception handling for it as well._
-
    - `Recipe for checking project dependent packages`- Click the `APPLY RECIPE` button to accept the
      recipe as well.
 
@@ -48,91 +42,100 @@
 6. **`Editor page`**
 
    - Select the file `src -> main.cpp` from the `Project Explorer` sidebar and modify the code as
-     below based on the suggestion. Note that the code changes might vary among different projects.
+     below. Then click the `SAVE` button to save the changes.
 
-   ```diff
-     // src/main.cpp
-     #include <iostream>
-     #include "controller.h"
-     #include "game.h"
-     #include "renderer.h"
-   + #include <emscripten.h>
+     ```diff
+       // src/main.cpp
+       #include <iostream>
+       #include "controller.h"
+       #include "game.h"
+       #include "renderer.h"
+     + #include <emscripten.h>
 
-   - int main() {
-     constexpr std::size_t kFramesPerSecond{60};
-     constexpr std::size_t kMsPerFrame{1000 / kFramesPerSecond};
-     constexpr std::size_t kScreenWidth{640};
-     constexpr std::size_t kScreenHeight{640};
-     constexpr std::size_t kGridWidth{32};
-     constexpr std::size_t kGridHeight{32};
+     - int main() {
+       constexpr std::size_t kFramesPerSecond{60};
+       constexpr std::size_t kMsPerFrame{1000 / kFramesPerSecond};
+       constexpr std::size_t kScreenWidth{640};
+       constexpr std::size_t kScreenHeight{640};
+       constexpr std::size_t kGridWidth{32};
+       constexpr std::size_t kGridHeight{32};
 
-     Renderer renderer(kScreenWidth, kScreenHeight, kGridWidth,  kGridHeight);
-     Controller controller;
-   -   Game game(kGridWidth, kGridHeight);
-   -   game.Run(controller, renderer, kMsPerFrame);
-   -   std::cout << "Game has terminated successfully!\n";
-   -   std::cout << "Score: " << game.GetScore() << "\n";
-   -   std::cout << "Size: " << game.GetSize() << "\n";
+       Renderer renderer(kScreenWidth, kScreenHeight, kGridWidth,  kGridHeight);
+       Controller controller;
+     -   Game game(kGridWidth, kGridHeight);
+     -   game.Run(controller, renderer, kMsPerFrame);
+     -   std::cout << "Game has terminated successfully!\n";
+     -   std::cout << "Score: " << game.GetScore() << "\n";
+     -   std::cout << "Size: " << game.GetSize() << "\n";
 
-   + Game *game;
+     + Game *game;
 
-   + void mainLoopWrapper(){
-   +   game->Run(controller, renderer, kMsPerFrame);
-   + }
+     + void mainLoopWrapper(){
+     +   game->Run(controller, renderer, kMsPerFrame);
+     + }
 
-   + int main() {
-   +   Game gameIns(kGridWidth, kGridHeight);
-   +   game = &gameIns;
-   +   emscripten_set_main_loop(mainLoopWrapper, 0, 1);
-       return 0;
-     }
-   ```
+     + int main() {
+     +   Game gameIns(kGridWidth, kGridHeight);
+     +   game = &gameIns;
+     +   emscripten_set_main_loop(mainLoopWrapper, 0, 1);
+         return 0;
+       }
+     ```
 
-   ```diff
-     // src/game.cpp
-   + #include <emscripten.h>
+   - Select the file `src -> game.cpp` from the `Project Explorer` sidebar and modify the code as
+     below. Then click the `SAVE` button to save the changes.
 
-     void Game::Run(Controller const &controller, Renderer &renderer,
-                  std::size_t target_frame_duration) {
-        Uint32 title_timestamp = SDL_GetTicks();
-        Uint32 frame_start;
-        Uint32 frame_end;
-        Uint32 frame_duration;
-        int frame_count = 0;
-        bool running = true;
-        int frame_count = 0;
-        bool running = true;
-   -    while (running) {
-          ...
-   -    }
-        ...
-     }
+     ```diff
+       // src/game.cpp
+     + #include <emscripten.h>
 
-     void Game::Update() {
-   -   if (!snake.alive) return;
-   +   if (!snake.alive){
-   +       // Use JS alert function to display the Score and Size when snake is died.
-   +       EM_ASM({
-   +           var message = 'Game Over...\nYour Score: ' +  $0 + '\nSize: '+ +$1;
-   +           alert(message);
-   +       }, score, snake.size);
-   +       emscripten_cancel_main_loop();
-   +       return;
-   +   }
-       ...
-     }
-   ```
+       void Game::Run(Controller const &controller, Renderer &renderer,
+                     std::size_t target_frame_duration) {
+           Uint32 title_timestamp = SDL_GetTicks();
+           Uint32 frame_start;
+           Uint32 frame_end;
+           Uint32 frame_duration;
+           int frame_count = 0;
+           bool running = true;
+           int frame_count = 0;
+           bool running = true;
+     -    while (running) {
+             ...
+     -    }
+           ...
+       }
 
-   ```diff
-     // CMakeLists.txt
-     project(SDL2Test)
-   + # to generate html target
-   + set(CMAKE_EXECUTABLE_SUFFIX ".html")
-   ```
+       void Game::Update() {
+     -   if (!snake.alive) return;
+     +   if (!snake.alive){
+     +       // Use JS alert function to display the Score and Size when snake is died.
+     +       EM_ASM({
+     +           var message = 'Game Over...\nYour Score: ' +  $0 + '\nSize: '+ +$1;
+     +           alert(message);
+     +       }, score, snake.size);
+     +       emscripten_cancel_main_loop();
+     +       return;
+     +   }
+         ...
+       }
+     ```
 
-- Click the `SAVE` button to save the changes.
+   - Select the file `CMakeLists.txt` from the `Project Explorer` sidebar and modify the code as
+     below. Then click the `SAVE` button to save the changes.
 
-- Click `Build` in the top navigation panel to route us back to the `Build` page.
+     ```diff
+       // CMakeLists.txt
+       project(SDL2Test)
+     + # to generate html target
+     + set(CMAKE_EXECUTABLE_SUFFIX ".html")
+     ```
+
+     > NOTE. _The demo is using the `html` generated by emscripten, generally `html` target could be
+     > generated with `emcc/em++ -o output.html`, which is not suitable approach when integrating
+     > with `emcmake` and `emmake`. Following suggestion is one approach to build `html` target, you
+     > could find the other ways that work._
+
+   - Click `Build` in the top navigation panel to route us back to the `Build` page.
 
 7. Receive the recipe for errors not handled by Webinzier
 
@@ -149,9 +152,9 @@ After a while, it will show `Build successfully!` on the page.
 
 - Below are the generated files that are required to run the demo:
 
-  - Snake.js
-  - Snake.wasm
-  - Snake.html
+  - `Snake.js`
+  - `Snake.wasm`
+  - `Snake.html`
 
 - Set up the server
 
