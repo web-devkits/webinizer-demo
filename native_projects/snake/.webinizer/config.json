@@ -1,0 +1,13 @@
+{
+  "__type__": "ProjectConfig",
+  "name": "Snake",
+  "desc": "Snake is a classic video puzzle game, implemented based on SDL2.",
+  "img": {
+    "name": "snake.png",
+    "isUploaded": true
+  },
+  "category": "Game",
+  "id": 6,
+  "version": "1.0.0",
+  "keywords": ["webinizer"]
+}

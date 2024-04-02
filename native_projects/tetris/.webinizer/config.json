@@ -2,7 +2,7 @@
   "__type__": "ProjectConfig",
   "name": "Tetris",
   "desc": "Tetris is a classic video puzzle game, implemented based on SDL2.",
-  "img": "../assets/getstarted/tetris.png",
+  "img": { "name": "tetris.png", "isUploaded": true },
   "category": "Game",
   "id": 0,
   "version": "1.0.0"
