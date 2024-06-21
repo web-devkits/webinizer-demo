@@ -149,6 +149,22 @@ if [[ (-d "CppND-Capstone-Snake-Game") && (-d "snake") ]]; then
   echo ">>>>>> Project snake downloaded"
 fi
 
+echo
+echo
+echo ">>>>>> Downloading project asteroids"
+git clone https://github.com/flightcrank/asteroids.git
+if [[ (-d "asteroids") && (-d "asteroids") ]]; then
+  cd asteroids
+  remove_git
+  cp -r ../asteroids/. .
+  # include .webinizer to track by git
+  git add -A
+  git commit -q -m "init for demo project"
+  cd ..
+  rm -rf asteroids
+  echo ">>>>>> Project asteroids downloaded"
+fi
+
 # back to the root directory
 cd ..
 
