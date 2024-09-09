@@ -152,16 +152,16 @@ fi
 echo
 echo
 echo ">>>>>> Downloading project asteroids"
-git clone https://github.com/flightcrank/asteroids.git
-if [[ (-d "asteroids") && (-d "asteroids") ]]; then
+git clone https://github.com/flightcrank/asteroids.git asteroids-game
+if [[ (-d "asteroids-game") && (-d "asteroids") ]]; then
   cd asteroids
   remove_git
-  cp -r ../asteroids/. .
+  cp -r ../asteroids-game/. .
   # include .webinizer to track by git
   git add -A
   git commit -q -m "init for demo project"
   cd ..
-  rm -rf asteroids
+  rm -rf asteroids-game
   echo ">>>>>> Project asteroids downloaded"
 fi
 
