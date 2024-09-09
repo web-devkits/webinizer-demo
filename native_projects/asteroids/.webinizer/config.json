@@ -3,7 +3,7 @@
   "name": "Asteroids",
   "desc": "Asteroids is a classic video game, implemented based on SDL2.",
   "img": {
-    "name": "asteroids.jpg",
+    "name": "asteroids.png",
     "isUploaded": true
   },
   "category": "Game",
