@@ -6,4 +6,4 @@
 
 cd webinizer-code/webclient
 
-npm run dev
+npm run serve
